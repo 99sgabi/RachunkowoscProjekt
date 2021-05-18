@@ -1,4 +1,23 @@
 <!DOCTYPE html>
 <html>
+    <form id="formularz">
+        <label>Wartość początkowa</label><br/>
+        <input type="number" name="wartPocz"><br/><br/>
+        <label>Stawka Amortyzacyjna</label><br/>
+        <input type="number" step="0.01" name="stwaka"><br/><br/>
+        <label>Wskaźnik akceleracji</label><br/>
+        <input type="number" step="0.01" name="wskaznik"><br/><br/>
+        <label>Data przyjecia:</label><br/>
+        <input type="date" name="data"><br/><br/>
+        <label>Częstotliwość naliczania:</label><br/>
+        <input type="number" name="czestotliwosc"><br/><br/>
+        <label>Metoda:</label>
+        <select name="metoda">
+            <option value="false">Liniowa</option>
+            <option value="true">Degresywna</option>
+        </select><br/>
+        <input type="submit" value="Oblicz"><br/><br/>
+    </form>
+    <p id="wynik"></p>
     <script src="./index.js"></script>
 </html>
