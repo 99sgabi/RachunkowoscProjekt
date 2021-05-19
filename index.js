@@ -28,7 +28,8 @@ formularz.onsubmit = (event) =>
     }
     else
     {
-        console.log(amortyzacjaNaWybranyOkres(
+        try{
+            console.log(amortyzacjaNaWybranyOkres(
             parseInt(formularz.elements["wartPocz"].value),
             parseFloat(formularz.elements["stwaka"].value),
             parseFloat(formularz.elements["wskaznik"].value),
@@ -36,6 +37,11 @@ formularz.onsubmit = (event) =>
             parseInt(formularz.elements["czestotliwosc"].value),
             true
         ))
+        }
+        catch(error)
+        {
+            console.log(error)
+        }
     }
     
     event.preventDefault();
@@ -178,7 +184,7 @@ function amortyzacjaNaWybranyOkres(wartoscPoczatkowa,stawkaAmortyzacyjna,
                 {
                     wynik.push({
                         wartoscPoczatkowa: miesieczne[index].wartoscPoczatkowa,
-                        data : miesieczne[index].data,
+                        data : new Date(Date.parse(`${miesieczne[index].data.getFullYear()}-${kwartal(miesiac) + 1}-01`)),
                         wartoscUmorzeniaNaPoczatekOkresu: miesieczne[index].wartoscPoczatkowa 
                             - miesieczne[index].wartoscNettoNaKoniecOkresu - amortyzacjaNaRok,
                         podstawaNaliczaniaAmortyzacji: miesieczne[index].podstawaNaliczaniaAmortyzacji,
@@ -210,7 +216,7 @@ function amortyzacjaNaWybranyOkres(wartoscPoczatkowa,stawkaAmortyzacyjna,
                     console.log(miesieczne[index].data.getFullYear())
                     wynik.push({
                         wartoscPoczatkowa: miesieczne[index].wartoscPoczatkowa,
-                        data : miesieczne[index].data,
+                        data : new Date(Date.parse(`${miesieczne[index].data.getFullYear()}-12-01`)),
                         wartoscUmorzeniaNaPoczatekOkresu: miesieczne[index].wartoscPoczatkowa 
                             - miesieczne[index].wartoscNettoNaKoniecOkresu - amortyzacjaNaRok,
                         podstawaNaliczaniaAmortyzacji: miesieczne[index].podstawaNaliczaniaAmortyzacji,
@@ -230,5 +236,14 @@ function amortyzacjaNaWybranyOkres(wartoscPoczatkowa,stawkaAmortyzacyjna,
     return [];
 }
 
+function kwartal(aktualny)
+{
+    let kwartaly = [2,5,8,11]
+    for(let i=0 ; i<4; i++)
+    {
+        if(aktualny <= kwartaly[i])
+            return kwartaly[i];
+    }
+}
 
 //metodaLiniowa(120000, 0.2, "Mat 9, 2021",12);
