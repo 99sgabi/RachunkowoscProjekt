@@ -15,33 +15,33 @@ let amortyzacjaMiesieczna;
 const formularz = document.getElementById("formularz");
 formularz.onsubmit = (event) =>
 {
-    if(formularz.elements["wartPocz"].value == "false")
+    if(formularz.elements["metoda"].value == "false")
     {
-        metodaDegresywan = false;
-        console.log(metodaLiniowa(
-            parseInt(formularz.elements["wartPocz"].value),
-            parseFloat(formularz.elements["stwaka"].value),
-            formularz.elements["data"].value,
-            parseInt(formularz.elements["czestotliwosc"].value)
-        ))
-    }
-    else
-    {
-        
-        metodaDegresywan = true;
-        console.log(metodaDegresywna(
+        console.log(amortyzacjaNaWybranyOkres(
             parseInt(formularz.elements["wartPocz"].value),
             parseFloat(formularz.elements["stwaka"].value),
             parseFloat(formularz.elements["wskaznik"].value),
             formularz.elements["data"].value,
-            parseInt(formularz.elements["czestotliwosc"].value)
+            parseInt(formularz.elements["czestotliwosc"].value),
+            false
+        ))
+    }
+    else
+    {
+        console.log(amortyzacjaNaWybranyOkres(
+            parseInt(formularz.elements["wartPocz"].value),
+            parseFloat(formularz.elements["stwaka"].value),
+            parseFloat(formularz.elements["wskaznik"].value),
+            formularz.elements["data"].value,
+            parseInt(formularz.elements["czestotliwosc"].value),
+            true
         ))
     }
     
     event.preventDefault();
 }
 
-function metodaDegresywna(wartoscPoczatkowa,stawkaAmortyzacyjna,
+function metodaDegresywnaMiesiace(wartoscPoczatkowa,stawkaAmortyzacyjna,
     wskaznikAkceleracji,dataPrzyjeciaSrodkaTrwalego,czestoscNaliczaniaWRoku)
 {
     let aktualneUmorzenie = 0;
@@ -60,7 +60,7 @@ function metodaDegresywna(wartoscPoczatkowa,stawkaAmortyzacyjna,
         }
 
         let amortyzacjaNaliczana = amortyzacjaRoczna/czestoscNaliczaniaWRoku;
-        amortyzacjaNaliczana = Math.round(amortyzacjaNaliczana)
+        amortyzacjaNaliczana = amortyzacjaNaliczana
         let podstawaNaliczania = degresywna ? wartoscPoczatkowa - aktualneUmorzenie : wartoscPoczatkowa;
         console.log( amortyzacjaRoczna)
         for(let i = aktualnaDataAmortyzacji.getMonth(); i < 12 && aktualneUmorzenie < wartoscPoczatkowa; 
@@ -70,10 +70,10 @@ function metodaDegresywna(wartoscPoczatkowa,stawkaAmortyzacyjna,
             aktualneUmorzenie += amortyzacjaNaliczana;
             wynik.push({
                 wartoscPoczatkowa: wartoscPoczatkowa,
-                data : aktualnaDataAmortyzacji.toDateString(),
+                data : aktualnaDataAmortyzacji,
                 wartoscUmorzeniaNaPoczatekOkresu: poprzedniaWartosc,
                 podstawaNaliczaniaAmortyzacji: podstawaNaliczania,
-                stawkaAmortyzacyjna: stawkaAmortyzacyjna,
+                stawkaAmortyzacyjna: degresywna ? stawkaAmortyzacyjna*wskaznikAkceleracji : stawkaAmortyzacyjna,
                 odpisUmorzeniaWDanymOkresie: wartoscPoczatkowa - poprzedniaWartosc > amortyzacjaNaliczana ? 
                                                     amortyzacjaNaliczana : wartoscPoczatkowa - poprzedniaWartosc,
                 wartoscNettoNaKoniecOkresu: wartoscPoczatkowa - aktualneUmorzenie < 0 ? 0:
@@ -87,7 +87,7 @@ function metodaDegresywna(wartoscPoczatkowa,stawkaAmortyzacyjna,
     return wynik;
 }
 
-function metodaLiniowa(wartoscPoczatkowa,stawkaAmortyzacyjna,
+function metodaLiniowaMiesiace(wartoscPoczatkowa,stawkaAmortyzacyjna,
     dataPrzyjeciaSrodkaTrwalego,czestoscNaliczaniaWRoku)
 {
     let amortyzacjaRoczna = wartoscPoczatkowa*stawkaAmortyzacyjna;
@@ -102,7 +102,7 @@ function metodaLiniowa(wartoscPoczatkowa,stawkaAmortyzacyjna,
         aktualneUmorzenie += amortyzacjaNaliczana;
         wynik.push({
             wartoscPoczatkowa: wartoscPoczatkowa,
-            data : aktualnaDataAmortyzacji.toDateString(),
+            data : aktualnaDataAmortyzacji,
             wartoscUmorzeniaNaPoczatekOkresu: poprzedniaWartosc,
             podstawaNaliczaniaAmortyzacji: wartoscPoczatkowa,
             stawkaAmortyzacyjna: stawkaAmortyzacyjna,
@@ -144,6 +144,90 @@ function nastepnyOkres(aktualnaData, czestoscNaliczaniaWRoku)
         miesiac += ileMiesiecy + 1;
 
     return new Date(Date.parse(`${rok}-${miesiac}-01`));
+}
+
+function amortyzacjaNaWybranyOkres(wartoscPoczatkowa,stawkaAmortyzacyjna,
+    wskaznikAkceleracji,dataPrzyjeciaSrodkaTrwalego,czestoscNaliczaniaWRoku, degresywna)
+{
+    let miesieczne = degresywna ? metodaDegresywnaMiesiace(
+        wartoscPoczatkowa,
+        stawkaAmortyzacyjna,
+        wskaznikAkceleracji,
+        dataPrzyjeciaSrodkaTrwalego,
+        12
+    ) :
+    metodaLiniowaMiesiace(
+        wartoscPoczatkowa,
+        stawkaAmortyzacyjna,
+        dataPrzyjeciaSrodkaTrwalego,
+        12
+    );
+    if(czestoscNaliczaniaWRoku == 12)
+        return miesieczne;
+    else if(czestoscNaliczaniaWRoku == 4)
+    {
+        let wynik = [], index = 0;
+        let amortyzacjaNaRok = 0;
+        while(index < miesieczne.length)
+        {
+            while(index < miesieczne.length)
+            {
+                let miesiac = miesieczne[index].data.getMonth()
+                amortyzacjaNaRok += miesieczne[index].odpisUmorzeniaWDanymOkresie;
+                if([2,5,8,11].includes(miesiac) || index == miesieczne.length - 1)
+                {
+                    wynik.push({
+                        wartoscPoczatkowa: miesieczne[index].wartoscPoczatkowa,
+                        data : miesieczne[index].data,
+                        wartoscUmorzeniaNaPoczatekOkresu: miesieczne[index].wartoscPoczatkowa 
+                            - miesieczne[index].wartoscNettoNaKoniecOkresu - amortyzacjaNaRok,
+                        podstawaNaliczaniaAmortyzacji: miesieczne[index].podstawaNaliczaniaAmortyzacji,
+                        stawkaAmortyzacyjna: miesieczne[index].stawkaAmortyzacyjna,
+                        odpisUmorzeniaWDanymOkresie: amortyzacjaNaRok,
+                        wartoscNettoNaKoniecOkresu: miesieczne[index].wartoscNettoNaKoniecOkresu
+                    })
+                    amortyzacjaNaRok = 0;
+                    index ++;
+                    break;
+                }
+                index++;
+            }
+        }
+        return wynik;
+    }
+    else if(czestoscNaliczaniaWRoku == 1)
+    {
+        let wynik = [], index = 0;
+        let amortyzacjaNaRok = 0;
+        while(index < miesieczne.length)
+        {
+            while(index < miesieczne.length)
+            {
+                let miesiac = miesieczne[index].data.getMonth()
+                amortyzacjaNaRok += miesieczne[index].odpisUmorzeniaWDanymOkresie;
+                if(miesiac == 11 || index == miesieczne.length - 1)
+                {
+                    console.log(miesieczne[index].data.getFullYear())
+                    wynik.push({
+                        wartoscPoczatkowa: miesieczne[index].wartoscPoczatkowa,
+                        data : miesieczne[index].data,
+                        wartoscUmorzeniaNaPoczatekOkresu: miesieczne[index].wartoscPoczatkowa 
+                            - miesieczne[index].wartoscNettoNaKoniecOkresu - amortyzacjaNaRok,
+                        podstawaNaliczaniaAmortyzacji: miesieczne[index].podstawaNaliczaniaAmortyzacji,
+                        stawkaAmortyzacyjna: miesieczne[index].stawkaAmortyzacyjna,
+                        odpisUmorzeniaWDanymOkresie: amortyzacjaNaRok,
+                        wartoscNettoNaKoniecOkresu: miesieczne[index].wartoscNettoNaKoniecOkresu
+                    })
+                    amortyzacjaNaRok = 0;
+                    index ++;
+                    break;
+                }
+                index++;
+            }
+        }
+        return wynik;
+    }
+    return [];
 }
 
 
