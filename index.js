@@ -14,8 +14,26 @@ let amortyzacjaMiesieczna;
 
 //wyświetlanie
 let table = document.getElementsByTagName("table")[0];
-let listaLata;
 function nowyWiersz(row, lp)
+{
+    let newRow = table.insertRow(lp+1);
+    let przyciski = newRow.insertCell();
+    let data = newRow.insertCell();
+    data.innerHTML = row.data.getFullYear() ;
+    let wartPocz = newRow.insertCell();
+    wartPocz.innerHTML = row.wartoscPoczatkowa;
+    let wartUm = newRow.insertCell();
+    wartUm.innerHTML = row.wartoscUmorzeniaNaPoczatekOkresu;
+    let podstNalA = newRow.insertCell();
+    podstNalA.innerHTML = row.podstawaNaliczaniaAmortyzacji;
+    let stawkaA = newRow.insertCell();
+    stawkaA.innerHTML = row.stawkaAmortyzacyjna;
+    let odpUm = newRow.insertCell();
+    odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie;
+    let netto = newRow.insertCell();
+    netto.innerHTML = row.wartoscNettoNaKoniecOkresu;
+}
+function nowyWierszSzczegoly(row, lp)
 {
     let newRow = table.insertRow(lp+1);
     let przyciski = newRow.insertCell();
@@ -33,13 +51,110 @@ function nowyWiersz(row, lp)
     odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie;
     let netto = newRow.insertCell();
     netto.innerHTML = row.wartoscNettoNaKoniecOkresu;
+    
+    //newRow.visible=false;
 }
 
 function czyszczenieTabeli()
 {
-    for(let i = table.rows.length - 2; i > 0 ; i--)
+    for(let i = table.rows.length - 1; i > 0 ; i--)
     {
         table.deleteRow(i);
+    }
+}
+
+/*function zliczanieLat()
+{
+    //na razie bierze 1 miesiąc danego roku
+    let wynik = [];
+    for(let i=0; i<listaLat.length;i++)
+    {
+        wynik.push({
+            data: listaLat[i][0].data,
+            wartoscPoczatkowa: listaLat[i][0].wartoscPoczatkowa,
+            wartoscUmorzeniaNaPoczatekOkresu: listaLat[i][0].wartoscUmorzeniaNaPoczatekOkresu,
+            podstawaNaliczaniaAmortyzacji: listaLat[i][0].podstawaNaliczaniaAmortyzacji,
+            stawkaAmortyzacyjna: listaLat[i][0].stawkaAmortyzacyjna,
+            odpisUmorzeniaWDanymOkresie: listaLat[i][0].odpisUmorzeniaWDanymOkresie,
+            wartoscNettoNaKoniecOkresu: listaLat[i][0].wartoscNettoNaKoniecOkresu
+        })
+    }
+    return wynik;
+}*/
+/*function zliczanieLat(miesiace)
+{
+    //na razie bierze 1 miesiąc danego roku
+    //wynik jest wierszem w tabeli dotyczacym roku
+    let wynik = [];
+    wynik.push({
+        data: miesiace[0].data,
+        wartoscPoczatkowa: miesiace[0].wartoscPoczatkowa,
+        wartoscUmorzeniaNaPoczatekOkresu: miesiace[0].wartoscUmorzeniaNaPoczatekOkresu,
+        podstawaNaliczaniaAmortyzacji: miesiace[0].podstawaNaliczaniaAmortyzacji,
+        stawkaAmortyzacyjna: miesiace[0].stawkaAmortyzacyjna,
+        odpisUmorzeniaWDanymOkresie: miesiace[0].odpisUmorzeniaWDanymOkresie,
+        wartoscNettoNaKoniecOkresu: miesiace[0].wartoscNettoNaKoniecOkresu
+    })
+    return wynik;
+}*/
+function zliczanieLat(miesiace)
+{
+    let odpis=0;
+    for(let i=0;i<miesiace.length;i++) odpis+=miesiace[i].odpisUmorzeniaWDanymOkresie;
+
+    let wynik = [];
+    wynik.push({
+        data: miesiace[0].data,
+        wartoscPoczatkowa: miesiace[0].wartoscPoczatkowa,
+        wartoscUmorzeniaNaPoczatekOkresu: miesiace[0].wartoscUmorzeniaNaPoczatekOkresu,
+        podstawaNaliczaniaAmortyzacji: miesiace[0].podstawaNaliczaniaAmortyzacji,
+        stawkaAmortyzacyjna: miesiace[0].stawkaAmortyzacyjna,
+        odpisUmorzeniaWDanymOkresie: odpis,
+        wartoscNettoNaKoniecOkresu: miesiace[miesiace.length-1].wartoscNettoNaKoniecOkresu
+    })
+    return wynik;
+}
+
+function wypelnianieTabeli(wyniki)
+{
+    try{
+        if(wyniki.length>0)
+        {
+            let rok = wyniki[0].data.getFullYear();
+            console.log(wyniki);
+            
+            let miesiace = [];
+            for(let i=0;i<wyniki.length;i++)
+            {
+                if(wyniki[i].data.getFullYear() == rok)
+                {
+                    miesiace.push(wyniki[i]);
+                }
+                else 
+                {
+                    let wynik = zliczanieLat(miesiace);
+                    nowyWiersz(wynik[0],table.rows.length-1)
+
+                    rok = wyniki[i].data.getFullYear();
+                    miesiace.length=0;
+                    miesiace.push(wyniki[i]);
+                }
+
+            }
+            let wynik = zliczanieLat(miesiace);
+            nowyWiersz(wynik[0],table.rows.length-1)
+
+            //console.log(listaLat)
+            /*let wynik = zliczanieLat();
+            //wypelnic tabele wierszami
+            for(let i=0; i<wynik.length;i++)
+            {
+                nowyWiersz(wynik[i], i);
+            }*/
+
+    }}
+    catch(error){
+        console.log(error)
     }
 }
 
@@ -58,10 +173,12 @@ formularz.onsubmit = (event) =>
             false
         );
 
-        for(let i=0; i<wynik.length;i++)
+        wypelnianieTabeli(wynik);
+
+        /*for(let i=0; i<wynik.length;i++)
         {
             nowyWiersz(wynik[i], i);
-        }
+        }*/
     }
     else
     {
