@@ -14,45 +14,89 @@ let amortyzacjaMiesieczna;
 
 //wyświetlanie
 let table = document.getElementsByTagName("table")[0];
+let div = document.getElementById("container");
+
 function nowyWiersz(row, lp)
 {
-    let newRow = table.insertRow(lp+1);
+    let newRow = table.insertRow(lp);
     let przyciski = newRow.insertCell();
+    przyciski.innerHTML = `<button data-row-number="${lp}" onclick='pokazSzczegoly(${lp});' class="down">▼</button>`;
     let data = newRow.insertCell();
     data.innerHTML = row.data.getFullYear() ;
     let wartPocz = newRow.insertCell();
     wartPocz.innerHTML = row.wartoscPoczatkowa;
     let wartUm = newRow.insertCell();
-    wartUm.innerHTML = row.wartoscUmorzeniaNaPoczatekOkresu;
+    wartUm.innerHTML = row.wartoscUmorzeniaNaPoczatekOkresu.toFixed(2);
     let podstNalA = newRow.insertCell();
     podstNalA.innerHTML = row.podstawaNaliczaniaAmortyzacji;
     let stawkaA = newRow.insertCell();
     stawkaA.innerHTML = row.stawkaAmortyzacyjna;
     let odpUm = newRow.insertCell();
-    odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie;
+    odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie.toFixed(2);
     let netto = newRow.insertCell();
-    netto.innerHTML = row.wartoscNettoNaKoniecOkresu;
+    netto.innerHTML = row.wartoscNettoNaKoniecOkresu.toFixed(2);
+
 }
 function nowyWierszSzczegoly(row, lp)
 {
-    let newRow = table.insertRow(lp+1);
+    let newRow = table.insertRow(lp);
     let przyciski = newRow.insertCell();
     let data = newRow.insertCell();
     data.innerHTML = row.data.getDate()+"/"+(row.data.getMonth()+1) +"/"+row.data.getFullYear() ;
     let wartPocz = newRow.insertCell();
     wartPocz.innerHTML = row.wartoscPoczatkowa;
     let wartUm = newRow.insertCell();
-    wartUm.innerHTML = row.wartoscUmorzeniaNaPoczatekOkresu;
+    wartUm.innerHTML = row.wartoscUmorzeniaNaPoczatekOkresu.toFixed(2);
     let podstNalA = newRow.insertCell();
     podstNalA.innerHTML = row.podstawaNaliczaniaAmortyzacji;
     let stawkaA = newRow.insertCell();
     stawkaA.innerHTML = row.stawkaAmortyzacyjna;
     let odpUm = newRow.insertCell();
-    odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie;
+    odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie.toFixed(2);
     let netto = newRow.insertCell();
-    netto.innerHTML = row.wartoscNettoNaKoniecOkresu;
-    
-    //newRow.visible=false;
+    netto.innerHTML = row.wartoscNettoNaKoniecOkresu.toFixed(2);
+
+    //newRow.style.display="none";
+
+}
+function ukryj(wiersz)
+{
+    table.rows[wiersz].style.display="none"
+    console.log(table.rows[wiersz].style.display)
+}
+function pokaz(wiersz)
+{
+    table.rows[wiersz].style.display="block"
+    console.log(table.rows[wiersz].style.display)
+}
+
+/*div.addEventListener("click", function(event){
+    if(event.target.className=="down"){
+        let rowNumber = parseInt(event.target.)
+        //pokazSzczegoly(rowNumber);
+    }
+    return false;
+})*/
+function pokazSzczegoly(lp)
+{
+    console.log(lp)
+    try{
+        lp++;
+        while(table.rows[lp].cells[1].innerHTML.length!=4 && table.rows.length - 1>lp)
+        {
+            if(table.rows[lp].style.display=="none")
+                pokaz(lp)
+            else ukryj(lp)
+
+            lp++;
+        }
+        console.log(table.rows[lp].cells[1].innerHTML.length)
+        
+        console.log(table.rows[lp])
+    }
+    catch(e) {
+        console.log(e)
+    }
 }
 
 function czyszczenieTabeli()
@@ -63,40 +107,6 @@ function czyszczenieTabeli()
     }
 }
 
-/*function zliczanieLat()
-{
-    //na razie bierze 1 miesiąc danego roku
-    let wynik = [];
-    for(let i=0; i<listaLat.length;i++)
-    {
-        wynik.push({
-            data: listaLat[i][0].data,
-            wartoscPoczatkowa: listaLat[i][0].wartoscPoczatkowa,
-            wartoscUmorzeniaNaPoczatekOkresu: listaLat[i][0].wartoscUmorzeniaNaPoczatekOkresu,
-            podstawaNaliczaniaAmortyzacji: listaLat[i][0].podstawaNaliczaniaAmortyzacji,
-            stawkaAmortyzacyjna: listaLat[i][0].stawkaAmortyzacyjna,
-            odpisUmorzeniaWDanymOkresie: listaLat[i][0].odpisUmorzeniaWDanymOkresie,
-            wartoscNettoNaKoniecOkresu: listaLat[i][0].wartoscNettoNaKoniecOkresu
-        })
-    }
-    return wynik;
-}*/
-/*function zliczanieLat(miesiace)
-{
-    //na razie bierze 1 miesiąc danego roku
-    //wynik jest wierszem w tabeli dotyczacym roku
-    let wynik = [];
-    wynik.push({
-        data: miesiace[0].data,
-        wartoscPoczatkowa: miesiace[0].wartoscPoczatkowa,
-        wartoscUmorzeniaNaPoczatekOkresu: miesiace[0].wartoscUmorzeniaNaPoczatekOkresu,
-        podstawaNaliczaniaAmortyzacji: miesiace[0].podstawaNaliczaniaAmortyzacji,
-        stawkaAmortyzacyjna: miesiace[0].stawkaAmortyzacyjna,
-        odpisUmorzeniaWDanymOkresie: miesiace[0].odpisUmorzeniaWDanymOkresie,
-        wartoscNettoNaKoniecOkresu: miesiace[0].wartoscNettoNaKoniecOkresu
-    })
-    return wynik;
-}*/
 function zliczanieLat(miesiace)
 {
     let odpis=0;
@@ -121,7 +131,7 @@ function wypelnianieTabeli(wyniki)
         if(wyniki.length>0)
         {
             let rok = wyniki[0].data.getFullYear();
-            console.log(wyniki);
+            let lp=1;
             
             let miesiace = [];
             for(let i=0;i<wyniki.length;i++)
@@ -133,7 +143,16 @@ function wypelnianieTabeli(wyniki)
                 else 
                 {
                     let wynik = zliczanieLat(miesiace);
-                    nowyWiersz(wynik[0],table.rows.length-1)
+                    nowyWiersz(wynik[0],lp);
+                    lp++;
+
+                    //szczegolowe wiersze, np. miesiace
+                    for(let j=0;j<miesiace.length;j++)
+                    {
+                        nowyWierszSzczegoly(miesiace[j],lp);
+                        lp++;
+                    }
+
 
                     rok = wyniki[i].data.getFullYear();
                     miesiace.length=0;
@@ -142,16 +161,13 @@ function wypelnianieTabeli(wyniki)
 
             }
             let wynik = zliczanieLat(miesiace);
-            nowyWiersz(wynik[0],table.rows.length-1)
-
-            //console.log(listaLat)
-            /*let wynik = zliczanieLat();
-            //wypelnic tabele wierszami
-            for(let i=0; i<wynik.length;i++)
+            nowyWiersz(wynik[0],lp)
+            lp++;
+            for(let j=0;j<miesiace.length;j++)
             {
-                nowyWiersz(wynik[i], i);
-            }*/
-
+                nowyWierszSzczegoly(miesiace[j],lp);
+                lp++;
+            }
     }}
     catch(error){
         console.log(error)
@@ -191,10 +207,13 @@ formularz.onsubmit = (event) =>
             parseInt(formularz.elements["czestotliwosc"].value),
             true
             );
+            
+            wypelnianieTabeli(wynik);
+            /*
             for(let i=0; i<wynik.length;i++)
             {
                 createNewRow(wynik[i], i);
-            }              
+            }   */           
 
         }
         catch(error)
