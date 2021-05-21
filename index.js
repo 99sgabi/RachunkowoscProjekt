@@ -12,31 +12,73 @@ let wartoscNetto;
 let amortyzacjaRoczna;
 let amortyzacjaMiesieczna;
 
+//wyświetlanie
+let table = document.getElementsByTagName("table")[0];
+let listaLata;
+function nowyWiersz(row, lp)
+{
+    let newRow = table.insertRow(lp+1);
+    let przyciski = newRow.insertCell();
+    let data = newRow.insertCell();
+    data.innerHTML = row.data.getDate()+"/"+(row.data.getMonth()+1) +"/"+row.data.getFullYear() ;
+    let wartPocz = newRow.insertCell();
+    wartPocz.innerHTML = row.wartoscPoczatkowa;
+    let wartUm = newRow.insertCell();
+    wartUm.innerHTML = row.wartoscUmorzeniaNaPoczatekOkresu;
+    let podstNalA = newRow.insertCell();
+    podstNalA.innerHTML = row.podstawaNaliczaniaAmortyzacji;
+    let stawkaA = newRow.insertCell();
+    stawkaA.innerHTML = row.stawkaAmortyzacyjna;
+    let odpUm = newRow.insertCell();
+    odpUm.innerHTML = row.odpisUmorzeniaWDanymOkresie;
+    let netto = newRow.insertCell();
+    netto.innerHTML = row.wartoscNettoNaKoniecOkresu;
+}
+
+function czyszczenieTabeli()
+{
+    for(let i = table.rows.length - 2; i > 0 ; i--)
+    {
+        table.deleteRow(i);
+    }
+}
+
 const formularz = document.getElementById("formularz");
 formularz.onsubmit = (event) =>
 {
+    czyszczenieTabeli();
     if(formularz.elements["metoda"].value == "false")
     {
-        console.log(amortyzacjaNaWybranyOkres(
+        let wynik = amortyzacjaNaWybranyOkres(
             parseInt(formularz.elements["wartPocz"].value),
             parseFloat(formularz.elements["stwaka"].value),
             parseFloat(formularz.elements["wskaznik"].value),
             formularz.elements["data"].value,
             parseInt(formularz.elements["czestotliwosc"].value),
             false
-        ))
+        );
+
+        for(let i=0; i<wynik.length;i++)
+        {
+            nowyWiersz(wynik[i], i);
+        }
     }
     else
     {
         try{
-            console.log(amortyzacjaNaWybranyOkres(
+            let wynik = amortyzacjaNaWybranyOkres(
             parseInt(formularz.elements["wartPocz"].value),
             parseFloat(formularz.elements["stwaka"].value),
             parseFloat(formularz.elements["wskaznik"].value),
             formularz.elements["data"].value,
             parseInt(formularz.elements["czestotliwosc"].value),
             true
-        ))
+            );
+            for(let i=0; i<wynik.length;i++)
+            {
+                createNewRow(wynik[i], i);
+            }              
+
         }
         catch(error)
         {

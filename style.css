@@ -1,0 +1,18 @@
+
+table{
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}
+tr{
+    border: lightslategray 2px solid;
+}
+.tabColor{
+    background-color: rgb(176, 196, 222);
+}
+.tabColorLight{
+    background-color: rgba(231, 239, 250, 0.192);
+}
+.tabColorDarker{
+    background-color: rgba(205, 222, 243, 0.301)
+}
