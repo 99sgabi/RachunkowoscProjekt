@@ -20,7 +20,7 @@ function nowyWiersz(row, lp)
 {
     let newRow = table.insertRow(lp);
     let przyciski = newRow.insertCell();
-    przyciski.innerHTML = `<button data-row-number="${lp}" onclick='pokazSzczegoly(${lp});' class="down">▼</button>`;
+    przyciski.innerHTML = `<button data-row-number="${lp}"  class="down">▼</button>`;
     let data = newRow.insertCell();
     data.innerHTML = row.data.getFullYear() ;
     let wartPocz = newRow.insertCell();
@@ -62,37 +62,46 @@ function nowyWierszSzczegoly(row, lp)
 function ukryj(wiersz)
 {
     table.rows[wiersz].style.display="none"
-    console.log(table.rows[wiersz].style.display)
+    table.rows[wiersz].hidden=true
+    console.log(table.rows[wiersz])
 }
 function pokaz(wiersz)
 {
     table.rows[wiersz].style.display="block"
-    console.log(table.rows[wiersz].style.display)
+    table.rows[wiersz].hidden=false
+    console.log(table.rows[wiersz])
 }
 
-/*div.addEventListener("click", function(event){
+div.addEventListener("click", function(event){
+    //console.log(event.target)
     if(event.target.className=="down"){
-        let rowNumber = parseInt(event.target.)
-        //pokazSzczegoly(rowNumber);
+        let rowNumber = parseInt(event.target.dataset.rowNumber)
+        pokazSzczegoly(rowNumber);
+        console.log(rowNumber)
     }
     return false;
-})*/
+})
+
 function pokazSzczegoly(lp)
 {
-    console.log(lp)
+    //console.log(lp)
     try{
         lp++;
         while(table.rows[lp].cells[1].innerHTML.length!=4 && table.rows.length - 1>lp)
         {
-            if(table.rows[lp].style.display=="none")
-                pokaz(lp)
-            else ukryj(lp)
-
+            //if(table.rows[lp].style.display=="none")
+            if(table.rows[lp].hidden)
+            {
+                table.rows[lp].hidden=false
+            }
+            else {
+                table.rows[lp].hidden=true
+            }
             lp++;
         }
-        console.log(table.rows[lp].cells[1].innerHTML.length)
+        //console.log(table.rows[lp].cells[1].innerHTML.length)
         
-        console.log(table.rows[lp])
+        //console.log(table.rows[lp])
     }
     catch(e) {
         console.log(e)
