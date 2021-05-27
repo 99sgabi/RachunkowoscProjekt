@@ -19,6 +19,7 @@ let div = document.getElementById("container");
 function nowyWiersz(row, lp)
 {
     let newRow = table.insertRow(lp);
+    newRow.style.backgroundColor = "#ceebfd"
     let przyciski = newRow.insertCell();
     przyciski.innerHTML = `<button data-row-number="${lp}"  class="down">▼</button>`;
     let data = newRow.insertCell();
