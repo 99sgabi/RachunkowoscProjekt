@@ -188,14 +188,46 @@ const formularz = document.getElementById("formularz");
 formularz.onsubmit = (event) =>
 {
     czyszczenieTabeli();
+    let wp = parseInt(formularz.elements["wartPocz"].value);
+    let st = parseFloat(formularz.elements["stwaka"].value);
+    let wsk = parseFloat(formularz.elements["wskaznik"].value);
+    let czest = parseInt(formularz.elements["czestotliwosc"].value);
+
+    console.log(wp)
+    if(isNaN(wp) || isNaN(st) || isNaN(czest) || (isNaN(wsk) && formularz.elements["data"].value == true))
+    {
+        alert("Wszystkie pola muszą zostać wypełnione");
+        return;
+    }
+    if(wp < 0 || st < 0 || wsk < 0)
+    {
+        alert("Podano niepoprawne wartosci, wszystkie powinny być dodatnie");
+        return;
+    }
+    if(st > 1)
+    {
+        alert("Stawka powinna przyjmować wartość mniejszą od 1");
+        return;
+    }
+    if(wsk > 2)
+    {
+        alert("Wskaznik nie powinien być wiekszy niż 2");
+        return;
+    }
+    if(czest != 1 && czest != 4 && czest != 12)
+    {
+        alert("Częstotliowść przyjmuje jedna z wartości 1/4/12");
+        return;
+    }
+
     if(formularz.elements["metoda"].value == "false")
     {
         let wynik = amortyzacjaNaWybranyOkres(
-            parseInt(formularz.elements["wartPocz"].value),
-            parseFloat(formularz.elements["stwaka"].value),
-            parseFloat(formularz.elements["wskaznik"].value),
+            wp,
+            st,
+            wsk,
             formularz.elements["data"].value,
-            parseInt(formularz.elements["czestotliwosc"].value),
+            czest,
             false
         );
 
@@ -210,12 +242,12 @@ formularz.onsubmit = (event) =>
     {
         try{
             let wynik = amortyzacjaNaWybranyOkres(
-            parseInt(formularz.elements["wartPocz"].value),
-            parseFloat(formularz.elements["stwaka"].value),
-            parseFloat(formularz.elements["wskaznik"].value),
-            formularz.elements["data"].value,
-            parseInt(formularz.elements["czestotliwosc"].value),
-            true
+                wp,
+                st,
+                wsk,
+                formularz.elements["data"].value,
+                czest,
+                true
             );
             
             wypelnianieTabeli(wynik);
