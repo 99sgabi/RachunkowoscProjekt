@@ -192,6 +192,7 @@ formularz.onsubmit = (event) =>
     let st = parseFloat(formularz.elements["stwaka"].value);
     let wsk = parseFloat(formularz.elements["wskaznik"].value);
     let czest = parseInt(formularz.elements["czestotliwosc"].value);
+    let dat = formularz.elements["data"].value;
 
     console.log(wp)
     if(isNaN(wp) || isNaN(st) || isNaN(czest) || (isNaN(wsk) && formularz.elements["data"].value == true))
@@ -265,6 +266,12 @@ formularz.onsubmit = (event) =>
     }
     
     event.preventDefault();
+    formularz.elements["wartPocz"].value = wp;
+    formularz.elements["stwaka"].value = st;
+    formularz.elements["wskaznik"].value = wsk;
+    formularz.elements["czestotliwosc"].value =czest;
+    formularz.elements["data"].value = dat;
+
 }
 
 function metodaDegresywnaMiesiace(wartoscPoczatkowa,stawkaAmortyzacyjna,
